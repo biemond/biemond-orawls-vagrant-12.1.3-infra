@@ -1,4 +1,4 @@
-#WebLogic 12.1.3 infra (JRF) cluster
+#WebLogic 12.1.3 infra (JRF) cluster with webtier
 
 ##Details
 - CentOS 6.5 vagrant box
@@ -27,7 +27,7 @@ Vagrant boxes
 ## Middleware
 
 ### Cluster with 1 node
-- jrf2admin2 10.10.10.21, WebLogic 12.1.3 with Infra ( JRF, ADF ) requires RCU
+- jrf2admin2 10.10.10.21, WebLogic 12.1.3 with Infra ( JRF, ADF ) requires RCU and WebTier
 
 http://10.10.10.21:7001/em with weblogic1 as password
 
@@ -35,3 +35,4 @@ http://10.10.10.21:7001/em with weblogic1 as password
 - JDK 1.7u51 jdk-7u51-linux-x64.tar.gz
 - JDK 7 JCE policy UnlimitedJCEPolicyJDK7.zip  
 - fmw_12.1.3.0.0_infrastructure.jar
+- fmw_12.1.3.0.0_ohs_linux64_Disk1_1of1.zip
