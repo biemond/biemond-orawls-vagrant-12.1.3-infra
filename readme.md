@@ -17,7 +17,7 @@ Vagrant boxes
 - vagrant up jrf2admin2
 
 ## Database
-- wlsdb 10.10.10.5, 11.2.0.4
+- wlsdb 10.10.10.5, 11.2.0.4 with Welcome01 as password
 
 ###software
 - Oracle Database 11.2.0.4 Linux
@@ -28,6 +28,8 @@ Vagrant boxes
 
 ### Cluster with 1 node
 - jrf2admin2 10.10.10.21, WebLogic 12.1.3 with Infra ( JRF, ADF ) requires RCU
+
+http://10.10.10.21:7001/em with weblogic1 as password
 
 ###software
 - JDK 1.7u51 jdk-7u51-linux-x64.tar.gz
