@@ -156,12 +156,14 @@ cluster_instances:
         ensure:         'present'
         messagingmode:  'unicast'
         migrationbasis: 'consensus'
-        servers:        'WebServer1'
+        servers:        
+          - 'WebServer1'
       'JmsCluster':
         ensure:         'present'
         messagingmode:  'unicast'
         migrationbasis: 'consensus'
-        servers:        'JmsWlsServer1'
+        servers:        
+          - 'JmsWlsServer1'
 
 file_persistence_folders:
    '/opt/oracle/wlsdomains/domains/adf_domain/JmsPersistence1':
@@ -177,26 +179,34 @@ file_persistence_store_instances:
   'jmsFile1':
     ensure:         'present'
     directory:      'JmsPersistence1'
-    target:         'JmsWlsServer1'
-    targettype:     'Server'
+    target:         
+      - 'JmsWlsServer1'
+    targettype:     
+      - 'Server'
 
 jmsserver_instances:
    'jmsServer1':
      ensure:              'present'
-     target:              'JmsWlsServer1'
-     targettype:          'Server'
+     target:              
+       - 'JmsWlsServer1'
+     targettype:          
+       - 'Server'
      persistentstore:     'jmsFile1'
      persistentstoretype: 'FileStore'
 
 jms_modules_instances:
    'jmsClusterModule':
      ensure:      'present'
-     target:      'JmsCluster'
-     targettype:  'Cluster'
+     target:      
+       - 'JmsCluster'
+     targettype:  
+       - 'Cluster'
 
 jms_subdeployments_instances:
    'jmsClusterModule:jmsServers':
       ensure:     'present'
-      target:     'jmsServer1'
-      targettype: 'JMSServer'
+      target:     
+        - 'jmsServer1'
+      targettype: 
+        - 'JMSServer'
 

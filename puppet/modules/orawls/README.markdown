@@ -1,5 +1,5 @@
 #Oracle WebLogic / Fusion Middleware puppet module V2
-[![Build Status](https://travis-ci.org/biemond/biemond-orawls.png)](https://travis-ci.org/biemond/biemond-orawls)
+[![Build Status](https://travis-ci.org/biemond/biemond-orawls.svg?branch=master)](https://travis-ci.org/biemond/biemond-orawls) [![Coverage Status](https://coveralls.io/repos/biemond/biemond-orawls/badge.png?branch=master)](https://coveralls.io/r/biemond/biemond-orawls?branch=master)
 
 created by Edwin Biemond email biemond at gmail dot com   
 [biemond.blogspot.com](http://biemond.blogspot.com)    
@@ -19,12 +19,14 @@ Many thanks to Bert Hajee (hajee) for his contributions, help and the his easy_t
 Should work for all Linux & Solaris versions like RedHat, CentOS, Ubuntu, Debian, Suse SLES, OracleLinux, Solaris 10,11 sparc / x86  
 
 Dependency with 
-- hajee/easy_type (latest)
+- hajee/easy_type >=0.10.0
 - adrien/filemapper >= 1.1.1
 - reidmv/yamlfile >=0.2.0
 
 ##History
-- 1.0.9 WebLogic 12.1.3 support ( optional with infra ), wls_adminserver type fix when using no custom trust
+- 1.0.11 target,targettype on all wls types expects an array instead of a string with ',' String will still work but puppet will try to change it in every puppet run same for servers parameter on wls_domain type + users parameter on wls_group type + virtualhostnames parameter on wls_virtual_host + jndinames, extraproperties, extrapropertiesvalues parameters on wls_datasource + wlsextraproperties, extrapropertiesvalues parameters on wls_foreign_server 
+- 1.0.10 fixed WebLogic 12.1.2 & 12.1.3 standard domain bug.
+- 1.0.9 WebLogic 12.1.3 (infra) support - support for 12.1.3 SOA,OSB,B2B,MFT installation - 12.1.3 Standard, ADF, SOA, OSB domain (no cluster) - wls_adminserver type fix when using no custom trust
 - 1.0.8 wls_server pass server arguments as an array, as it makes it easier to use references in YAML, Added log file options to wls_server 
 - 1.0.7 wls_adminserver,wls_managedserver type to start,stop and refresh a managed server ( or subscribe to changes and do an autorestart ), bsu,opatch, resource adapter & a small nodemanager fix 
 - 1.0.6 Readme with links, wls types title cleanup, multiple resource adapter entries fix, wls_domain fix, bsu & opatch also works on < puppet 3.2, hiera vars without an undef default
@@ -38,34 +40,19 @@ Dependency with
 ##Complete examples
 see the following usages below  
 
-###Masterless (vagrant box)
+###full working vagrant boxes
 
-WebLogic 12.1.3 Reference implementation, the vagrant test case for full working WebLogic 12.1.3 cluster example  
-https://github.com/biemond/biemond-orawls-vagrant-12.1.3  
-
-WebLogic 12.1.3 infra (JRF), the vagrant test case for full working WebLogic 12.1.3 infra cluster example with WebTier (Oracle HTTP Server)   
-https://github.com/biemond/biemond-orawls-vagrant-12.1.3-infra  
-
-WebLogic 12.1.2 Reference implementation, the vagrant test case for full working WebLogic 12.1.2 cluster example  
-https://github.com/biemond/biemond-orawls-vagrant-12.1.2  
-
-WebLogic 12.1.2 infra (JRF) with WebTier, the vagrant test case for full working WebLogic 12.1.2 infra cluster example with WebTier (Oracle HTTP Server)  
-https://github.com/biemond/biemond-orawls-vagrant-12.1.2-infra  
-
-Reference Solaris implementation, the vagrant test case for full working WebLogic 12.1.2 cluster example  
-https://github.com/biemond/biemond-orawls-vagrant-solaris  
-
-Reference OIM / OAM with WebTier, Webgate & Oracle Unified Directory, the vagrant test case for Oracle Identity Manager & Oracle Access Manager 11.1.2.2 example  
-https://github.com/biemond/biemond-orawls-vagrant-oim_oam
-
-WebLogic 11g Reference implementation, the vagrant test case for full working WebLogic 10.3.6 cluster example  
-https://github.com/biemond/biemond-orawls-vagrant  
-
-Reference Oracle SOA Suite, the vagrant test case for full working WebLogic 10.3.6 SOA Suite + OSB cluster example  
-https://github.com/biemond/biemond-orawls-vagrant-solaris-soa
-
-###Puppetmaster (vagrant box)
-Example of Opensource Puppet 3.4.3 Puppet master configuration in a vagrant box (https://github.com/biemond/vagrant-puppetmaster) 
+- WebLogic 12.1.3 Reference implementation, the vagrant test case for full working WebLogic 12.1.3 cluster example [biemond-orawls-vagrant-12.1.3](https://github.com/biemond/biemond-orawls-vagrant-12.1.3) 
+- WebLogic 12.1.3 infra (JRF), the vagrant test case for full working WebLogic 12.1.3 infra cluster example with WebTier (Oracle HTTP Server) [biemond-orawls-vagrant-12.1.3-infra](https://github.com/biemond/biemond-orawls-vagrant-12.1.3-infra)
+- WebLogic 12.1.3 infra with OSB, the vagrant test case for full working WebLogic 12.1.3 infra OSB example [biemond-orawls-vagrant-12.1.3-infra-osb](https://github.com/biemond/biemond-orawls-vagrant-12.1.3-infra-osb)
+- WebLogic 12.1.3 infra with OSB & SOA,ESS,BAM, the vagrant test case for full working WebLogic 12.1.3 infra OSB SOA example [biemond-orawls-vagrant-12.1.3-infra-soa](https://github.com/biemond/biemond-orawls-vagrant-12.1.3-infra-soa)   
+- WebLogic 12.1.2 Reference implementation, the vagrant test case for full working WebLogic 12.1.2 cluster example [biemond-orawls-vagrant-12.1.2](https://github.com/biemond/biemond-orawls-vagrant-12.1.2)   
+- WebLogic 12.1.2 infra (JRF) with WebTier, the vagrant test case for full working WebLogic 12.1.2 infra cluster example with WebTier (Oracle HTTP Server) [biemond-orawls-vagrant-12.1.2-infra](https://github.com/biemond/biemond-orawls-vagrant-12.1.2-infra) 
+- Reference Solaris implementation, the vagrant test case for full working WebLogic 12.1.2 cluster example [biemond-orawls-vagrant-solaris](https://github.com/biemond/biemond-orawls-vagrant-solaris) 
+- Reference OIM / OAM with WebTier, Webgate & Oracle Unified Directory, the vagrant test case for Oracle Identity Manager & Oracle Access Manager 11.1.2.2 example [biemond-orawls-vagrant-oim_oam](https://github.com/biemond/biemond-orawls-vagrant-oim_oam) 
+- WebLogic 11g Reference implementation, the vagrant test case for full working WebLogic 10.3.6 cluster example [biemond-orawls-vagrant](https://github.com/biemond/biemond-orawls-vagrant) 
+- Reference Oracle SOA Suite, the vagrant test case for full working WebLogic 10.3.6 SOA Suite + OSB cluster example [biemond-orawls-vagrant-solaris-soa](https://github.com/biemond/biemond-orawls-vagrant-solaris-soa) 
+- Example of Opensource Puppet 3.4.3 Puppet master configuration in a vagrant box [vagrant-puppetmaster](https://github.com/biemond/vagrant-puppetmaster)
 
 ##Orawls WebLogic Features
 
@@ -73,7 +60,7 @@ Example of Opensource Puppet 3.4.3 Puppet master configuration in a vagrant box 
 - [Apply a BSU patch](#bsu) on a Middleware home ( < 12.1.2 )
 - [Apply a OPatch](#opatch) on a Middleware home ( >= 12.1.2 ) or a Oracle product home
 - [Create a WebLogic domain](#domain)
-- [Pack a WebLogic domain](#pack)
+- [Pack a WebLogic domain](#packdomain)
 - [Copy a WebLogic domain](#copydomain) to a other node with SSH, unpack and enroll to a nodemanager
 - [JSSE](#jsse) Java Secure Socket Extension support
 - [Custom Identity and Trust Store support](#identity)
@@ -82,7 +69,7 @@ Example of Opensource Puppet 3.4.3 Puppet master configuration in a vagrant box 
 - [start or stop AdminServer, Managed or a Cluster](#control)
 - [StoreUserConfig](#storeuserconfig) for storing WebLogic Credentials and using in WLST
 
-###Fusion Middleware Features
+###Fusion Middleware Features 11g & 12.1.3
 - installs [FMW](#fmw) software(add-on) to a middleware home, like OSB,SOA Suite, Oracle Identity & Access Management, Oracle Unified Directory, WebCenter Portal + Content
 - [WebTier](#webtier) Oracle HTTP server
 - [OSB, SOA Suite](#fmwcluster) ( with BPM ) and BAM Cluster configuration support ( convert single osb/soa/bam servers to clusters and migrate OPSS to the database )
@@ -406,9 +393,7 @@ common.yaml
 ##WebLogic Module Usage
 
 ###weblogic
-__orawls::weblogic__ installs WebLogic 10.3.[0-6], 12.1.1 or 12.1.2  
-these settings works for wls_121200.jar when you want to install the 12.1.2 FMW infra version  
-use fmw_infra_121200.jar as filename and set fmw_infra parameter to true  
+__orawls::weblogic__ installs WebLogic 10.3.[0-6], 12.1.1, 12.1.2 & 12.1.3  
 
     class{'orawls::weblogic':                             
       version              => 1212,                       # 1036|1211|1212|1213
@@ -422,6 +407,23 @@ use fmw_infra_121200.jar as filename and set fmw_infra parameter to true
       source               => "/vagrant",                 # puppet:///modules/orawls/ | /mnt |
       log_output           => true,                      
     }
+
+12.1.3 infra
+
+    class{'orawls::weblogic':                             
+      version              => 1213,
+      filename             => 'fmw_12.1.3.0.0_infrastructure.jar',
+      fmw_infra            => true,
+      jdk_home_dir         => '/usr/java/jdk1.7.0_55',    
+      oracle_base_home_dir => "/opt/oracle",              
+      middleware_home_dir  => "/opt/oracle/middleware12c",
+      os_user              => "oracle",                   
+      os_group             => "dba",                      
+      download_dir         => "/data/install",            
+      source               => "puppet:///middleware",
+      log_output           => true,                      
+    }
+
 
 or with a bin file located on a share
 
@@ -595,7 +597,7 @@ or when you set the defaults hiera variables
 __orawls::fmw__ installs FMW software (add-on) to a middleware home like OSB,SOA Suite, WebTier (HTTP Server), Oracle Identity Management, Web Center + Content
 
 
-    # fmw_product = adf|soa|osb|wcc|wc|oim|web|webgate
+    # fmw_product = adf|soa|osb|wcc|wc|oim|web|webgate|b2b|mft
     orawls::fmw{"osbPS6":
       middleware_home_dir     => "/opt/oracle/middleware11gR1",
       weblogic_home_dir       => "/opt/oracle/middleware11gR1/wlserver",
@@ -618,10 +620,17 @@ or when you set the defaults hiera variables
       fmw_file1               => "ofm_osb_generic_11.1.1.7.0_disk1_1of1.zip",
       log_output              => false,
     }
+
+    orawls::fmw{"osb12.1.3":
+      version                 => 1213
+      fmw_product             => "osb"
+      fmw_file1               => "fmw_12.1.3.0.0_osb_Disk1_1of1.zip",
+      log_output              => false,
+    }
+
     
 
 Same configuration but then with Hiera ( need to have puppet > 3.0 )    
-
 
     $default_params = {}
     $fmw_installations = hiera('fmw_installations', {})
@@ -632,7 +641,45 @@ common.yaml
 
 when you set the defaults hiera variables
 
-    ---
+    if ( defined(Orawls::Fmw["b2b1213"])) {
+      Orawls::Fmw["soa1213"] -> Orawls::Fmw["b2b1213"]
+    }
+
+
+    fmw_installations:
+      'soa1213':
+        version:                 *wls_version
+        fmw_product:             "soa"
+        fmw_file1:               "fmw_12.1.3.0.0_soa_Disk1_1of1.zip"
+        bpm:                     true
+        log_output:              true
+        remote_file:             false
+      'webtier1213':
+        version:                 *wls_version
+        fmw_product:             "web"
+        fmw_file1:               "fmw_12.1.3.0.0_ohs_linux64_Disk1_1of1.zip"
+        log_output:              true
+        remote_file:             false
+      'osb1213':
+        version:                 *wls_version
+        fmw_product:             "osb"
+        fmw_file1:               "fmw_12.1.3.0.0_osb_Disk1_1of1.zip"
+        log_output:              true
+        remote_file:             false
+      'mft1213':
+        version:                 *wls_version
+        fmw_product:             "mft"
+        fmw_file1:               "fmw_12.1.3.0.0_mft_Disk1_1of1.zip"
+        log_output:              true
+        remote_file:             false
+      'b2b1213':
+        version:                 *wls_version
+        fmw_product:             "b2b"
+        healthcare:              true
+        fmw_file1:               "fmw_12.1.3.0.0_b2b_Disk1_1of1.zip"
+        log_output:              true
+        remote_file:             false
+
     # FMW installation on top of WebLogic 10.3.6
     fmw_installations:
       'osbPS6':
@@ -827,13 +874,25 @@ or with custom identity and custom truststore
         custom_identity_privatekey_passphrase: 'welcome'
 
 
-###pack 
+###packdomain 
 __orawls::packdomain__ pack a WebLogic Domain and add this to the download folder
+
+    orawls::packdomain{"Wls12c":
+      weblogic_home_dir      => "/opt/oracle/middleware12c/wlserver",
+      middleware_home_dir    => "/opt/oracle/middleware12c",
+      jdk_home_dir           => "/usr/java/jdk1.7.0_45",
+      wls_domains_dir        => "/opt/oracle/domains",
+      domain_name            => "Wls12c",
+      os_user                => "oracle",
+      os_group               => "dba",
+      download_dir           => "/data/install",
+    }
+
+or with hiera
 
     $default_params = {}
     $pack_domain_instances = hiera('pack_domain_instances', {})
     create_resources('orawls::packdomain',$pack_domain_instances, $default_params)
-
 
     # pack domains
     pack_domain_instances:
@@ -844,6 +903,28 @@ __orawls::packdomain__ pack a WebLogic Domain and add this to the download folde
 ###copydomain 
 __orawls::copydomain__ copies a WebLogic domain with SSH or from a share, unpack and enroll to a nodemanager
 
+When using ssh (use_ssh = true) you need to setup ssh so you won't need to provide a password
+
+    orawls::copydomain{"Wls12c":
+      version                => 1212,
+      weblogic_home_dir      => "/opt/oracle/middleware12c/wlserver",
+      middleware_home_dir    => "/opt/oracle/middleware12c",
+      jdk_home_dir           => "/usr/java/jdk1.7.0_45",
+      wls_domains_dir        => "/opt/oracle/domains",
+      wls_apps_dir           => "/opt/oracle/applications",
+      domain_name            => "Wls12c",
+      os_user                => "oracle",
+      os_group               => "dba",
+      download_dir           => "/data/install",
+      log_dir                => "/var/log/weblogic",
+      log_output             => true,
+      use_ssh                => false,
+      domain_pack_dir        => /mnt/fmw_share,
+      adminserver_address    => "10.10.10.10",
+      adminserver_port       => 7001,
+      weblogic_user          => "weblogic",
+      weblogic_password      => "weblogic1", 
+    }
 
 Configuration with Hiera ( need to have puppet > 3.0 )    
 
@@ -1540,16 +1621,16 @@ or use puppet resource wls_deployment
     wls_deployment { 'jersey-bundle':
       ensure            => 'present',
       deploymenttype    => 'Library',
-      target            => 'AdminServer,WebCluster',
-      targettype        => 'Server,Cluster',
+      target            => ['AdminServer','WebCluster'],
+      targettype        => ['Server','Cluster'],
       versionidentifier => '1.18@1.18.0.0',
       localpath         =>  '/vagrant/jersey-bundle-1.18.war',
     }
     wls_deployment { 'webapp':
       ensure            => 'present',
       deploymenttype    => 'AppDeployment',
-      target            => 'WebCluster',
-      targettype        => 'Cluster',
+      target            => ['WebCluster'],
+      targettype        => ['Cluster'],
       localpath         => '/vagrant/webapp.war',
     }
 
@@ -1558,8 +1639,8 @@ or add a version
     wls_deployment { 'webapp':
       ensure            => 'present',
       deploymenttype    => 'AppDeployment',
-      target            => 'WebCluster',
-      targettype        => 'Cluster',
+      target            => ['WebCluster'],
+      targettype        => ['Cluster'],
       versionidentifier => '1.1@1.1.0.0',
       localpath         => '/vagrant/webapp.war',
     }
@@ -1576,8 +1657,12 @@ in hiera
         ensure:            'present'
         deploymenttype:    'Library'
         versionidentifier: '1.18@1.18.0.0'
-        target:            'AdminServer,WebCluster'
-        targettype:        'Server,Cluster'
+        target:            
+          - 'AdminServer'
+          - 'WebCluster'
+        targettype:        
+          - 'Server'
+          - 'Cluster'
         localpath:         '/vagrant/jersey-bundle-1.18.war'
 
     $default_params = {}
@@ -1589,8 +1674,12 @@ in hiera
         ensure:            'present'
         deploymenttype:    'AppDeployment'
         versionidentifier: '1.1@1.1.0.0'
-        target:            'AdminServer,WebCluster'
-        targettype:        'Server,Cluster'
+        target:            
+          - 'AdminServer'
+          - 'WebCluster'
+        targettype:        
+          - 'Server'
+          - 'Cluster'
         localpath:         '/vagrant/webapp.war'
 
 
@@ -1653,14 +1742,14 @@ or use puppet resource wls_group
       authenticationprovider => 'DefaultAuthenticator',
       description            => 'SuperUsers',
       realm                  => 'myrealm',
-      users                  => 'testuser2',
+      users                  => ['testuser2'],
     }
     wls_group { 'TestGroup':
       ensure                 => 'present',
       authenticationprovider => 'DefaultAuthenticator',
       description            => 'TestGroup',
       realm                  => 'myrealm',
-      users                  => 'testuser1,testuser2',
+      users                  => ['testuser1','testuser2'],
     }
 
 in hiera
@@ -1675,13 +1764,16 @@ in hiera
         authenticationprovider: 'DefaultAuthenticator'
         description:            'TestGroup'
         realm:                  'myrealm'
-        users:                  'testuser1,testuser2'
+        users:                  
+          - 'testuser1'
+          - 'testuser2'
       'SuperUsers':
         ensure:                 'present'
         authenticationprovider: 'DefaultAuthenticator'
         description:            'SuperUsers'
         realm:                  'myrealm'
-        users:                  'testuser2'
+        users:                  
+          - 'testuser2'
 
 ###wls_authentication_provider
 
@@ -1996,7 +2088,7 @@ or use puppet resource wls_cluster
         ensure           => 'present',
         messagingmode    => 'unicast',
         migrationbasis   => 'consensus',
-        servers          => 'wlsServer3,wlsServer4',
+        servers          => ['wlsServer3','wlsServer4'],
         multicastaddress => '239.192.0.0',
         multicastport    => '7001',
       }
@@ -2005,7 +2097,7 @@ or use puppet resource wls_cluster
         ensure                  => 'present',
         messagingmode           => 'unicast',
         migrationbasis          => 'consensus',
-        servers                 => 'wlsServer3,wlsServer4',
+        servers                 => ['wlsServer3','wlsServer4'],
         unicastbroadcastchannel => 'channel',
         multicastaddress        => '239.192.0.0',
         multicastport           => '7001',
@@ -2018,7 +2110,9 @@ in hiera
         ensure:         'present'
         messagingmode:  'unicast'
         migrationbasis: 'consensus'
-        servers:        'wlsServer1,wlsServer2'
+        servers:
+          - 'wlsServer1'
+          - 'wlsServer2'
 
 ###wls_virtual_host
 
@@ -2027,10 +2121,11 @@ it needs wls_setting and when domain is not provided it will use the 'default'
 or use puppet resource wls_virtual_host
 
     wls_virtual_host { 'default/WS':
-      ensure     => 'present',
-      channel    => 'HTTP',
-      target     => 'WebCluster',
-      targettype => 'Cluster',
+      ensure             => 'present',
+      channel            => 'HTTP',
+      target             => ['WebCluster'],
+      targettype         => ['Cluster'],
+      virtual_host_names => ['admin.example.com','10.10.10.10'],
     }
 
 in hiera
@@ -2039,8 +2134,13 @@ in hiera
      'WS':
        ensure:     'present'
        channel:    'HTTP'
-       target:     'WebCluster'
-       targettype: 'Cluster'
+       target:
+         - 'WebCluster'
+       targettype:
+         - 'Cluster'
+       virtual_host_names: 
+         - 'admin.example.com'
+         - '10.10.10.10'
 
 ###wls_workmanager_constaint
 
@@ -2052,22 +2152,22 @@ or use puppet resource wls_workmanager_constaint
       ensure          => 'present',
       constrainttype  => 'Capacity',
       constraintvalue => '20',
-      target          => 'WebCluster',
-      targettype      => 'Cluster',
+      target          => ['WebCluster'],
+      targettype      => ['Cluster'],
     }
     wls_workmanager_constraint { 'default/MaxThreadsConstraint':
       ensure          => 'present',
       constrainttype  => 'MaxThreadsConstraint',
       constraintvalue => '5',
-      target          => 'WebCluster',
-      targettype      => 'Cluster',
+      target          => ['WebCluster'],
+      targettype      => ['Cluster'],
     }
     wls_workmanager_constraint { 'default/MinThreadsConstraint':
       ensure          => 'present',
       constrainttype  => 'MinThreadsConstraint',
       constraintvalue => '2',
-      target          => 'WebCluster',
-      targettype      => 'Cluster',
+      target          => ['WebCluster'],
+      targettype      => ['Cluster'],
     }
 
 in hiera
@@ -2076,20 +2176,26 @@ in hiera
       'CapacityConstraint':
         ensure:          'present'
         constraintvalue: '20'
-        target:          'WebCluster'
-        targettype:      'Cluster'
+        target:          
+          - 'WebCluster'
+        targettype:      
+          - 'Cluster'
         constrainttype:  'Capacity'
       'MaxThreadsConstraint':
         ensure:          'present'
         constraintvalue: '5'
-        target:          'WebCluster'
-        targettype:      'Cluster'
+        target:          
+          - 'WebCluster'
+        targettype:      
+          - 'Cluster'
         constrainttype:  'MaxThreadsConstraint'
       'MinThreadsConstraint':
         ensure:          'present'
         constraintvalue: '2'
-        target:          'WebCluster'
-        targettype:      'Cluster'
+        target:          
+          - 'WebCluster'
+        targettype:      
+          - 'Cluster'
         constrainttype:  'MinThreadsConstraint'
 
 ###wls_workmanager
@@ -2104,8 +2210,8 @@ or use puppet resource wls_workmanager
       maxthreadsconstraint => 'MaxThreadsConstraint',
       minthreadsconstraint => 'MinThreadsConstraint',
       stuckthreads         => '0',
-      target               => 'WebCluster',
-      targettype           => 'Cluster',
+      target               => ['WebCluster'],
+      targettype           => ['Cluster'],
     }
 
 in hiera
@@ -2117,8 +2223,10 @@ in hiera
         maxthreadsconstraint:  'MaxThreadsConstraint'
         minthreadsconstraint:  'MinThreadsConstraint'
         stuckthreads:          '1'
-        target:                'WebCluster'
-        targettype:            'Cluster'
+        target:                
+          - 'WebCluster'
+        targettype:            
+          - 'Cluster'
 
 
 
@@ -2131,20 +2239,20 @@ or use puppet resource wls_file_persistence_store
     wls_file_persistence_store { 'jmsFile1':
       ensure     => 'present',
       directory  => 'persistence1',
-      target     => 'wlsServer1',
-      targettype => 'Server',
+      target     => ['wlsServer1'],
+      targettype => ['Server'],
     }
     wls_file_persistence_store { 'jmsFile2':
       ensure     => 'present',
       directory  => 'persistence2',
-      target     => 'wlsServer2',
-      targettype => 'Server',
+      target     => ['wlsServer2'],
+      targettype => ['Server'],
     }
     wls_file_persistence_store { 'jmsFileSAFAgent1':
       ensure     => 'present',
       directory  => 'persistenceSaf1',
-      target     => 'wlsServer1',
-      targettype => 'Server',
+      target     => ['wlsServer1'],
+      targettype => ['Server'],
     }
 
 in hiera
@@ -2153,18 +2261,24 @@ in hiera
       'jmsFile1':
         ensure:         'present'
         directory:      'persistence1'
-        target:         'wlsServer1'
-        targettype:     'Server'
+        target:         
+         - 'wlsServer1'
+        targettype:     
+         - 'Server'
       'jmsFile2':
         ensure:         'present'
         directory:      'persistence2'
-        target:         'wlsServer2'
-        targettype:     'Server'
+        target:         
+         - 'wlsServer2'
+        targettype:     
+         - 'Server'
       'jmsFileSAFAgent1':
         ensure:         'present'
         directory:      'persistenceSaf1'
-        target:         'wlsServer1'
-        targettype:     'Server'
+        target:         
+         - 'wlsServer1'
+        targettype:     
+         - 'Server'
 
 
 ###wls_safagent
@@ -2179,15 +2293,15 @@ or use puppet resource wls_safagent
       persistentstore     => 'jmsFileSAFAgent1',
       persistentstoretype => 'FileStore',
       servicetype         => 'Sending-only',
-      target              => 'wlsServer1',
-      targettype          => 'Server',
+      target              => ['wlsServer1'],
+      targettype          => ['Server'],
     }
 
     wls_safagent { 'jmsSAFAgent2':
       ensure      => 'present',
       servicetype => 'Both',
-      target      => 'wlsServer2',
-      targettype  => 'Server',
+      target      => ['wlsServer2'],
+      targettype  => ['Server'],
     }
 
 in hiera
@@ -2195,15 +2309,19 @@ in hiera
     safagent_instances:
     'jmsSAFAgent1':
           ensure:              'present'
-          target:              'wlsServer1'
-          targettype:          'Server'
+          target:              
+            - 'wlsServer1'
+          targettype:          
+            - 'Server'
           servicetype:         'Sending-only'
           persistentstore:     'jmsFileSAFAgent1'
           persistentstoretype: 'FileStore'
     'jmsSAFAgent2':
           ensure:              'present'
-          target:              'wlsServer2'
-          targettype:          'Server'
+          target:              
+            - 'wlsServer2'
+          targettype:          
+            - 'Server'
           servicetype:         'Both'
 
 
@@ -2217,18 +2335,18 @@ or use puppet resource wls_jmsserver
       ensure              => 'present',
       persistentstore     => 'jmsFile1',
       persistentstoretype => 'FileStore',
-      target              => 'wlsServer1',
-      targettype          => 'Server',
+      target              => ['wlsServer1'],
+      targettype          => ['Server'],
     }
     wls_jmsserver { 'jmsServer2':
       ensure     => 'present',
-      target     => 'wlsServer2',
-      targettype => 'Server',
+      target     => ['wlsServer2'],
+      targettype => ['Server'],
     }
     wls_jmsserver { 'jmsServer3':
       ensure     => 'present',
-      target     => 'wlsServer3',
-      targettype => 'Server',
+      target     => ['wlsServer3'],
+      targettype => ['Server'],
     }
 
 
@@ -2237,14 +2355,18 @@ in hiera
     jmsserver_instances:
        jmsServer1:
          ensure:              'present'
-         target:              'wlsServer1'
-         targettype:          'Server'
+         target:              
+           - 'wlsServer1'
+         targettype:          
+           - 'Server'
          persistentstore:     'jmsFile1'
          persistentstoretype: 'FileStore'
        jmsServer2:
          ensure:              'present'
-         target:              'wlsServer2'
-         targettype:          'Server'
+         target:              
+           - 'wlsServer2'
+         targettype:          
+           - 'Server'
 
 
 ###wls_datasource
@@ -2256,14 +2378,14 @@ or use puppet resource wls_datasource
     wls_datasource { 'hrDS':
       ensure                     => 'present',
       drivername                 => 'oracle.jdbc.xa.client.OracleXADataSource',
-      extraproperties            => 'SendStreamAsBlob,oracle.net.CONNECT_TIMEOUT',
-      extrapropertiesvalues      => 'true,10000',
+      extraproperties            => ['SendStreamAsBlob','oracle.net.CONNECT_TIMEOUT'],
+      extrapropertiesvalues      => ['true','10000'],
       globaltransactionsprotocol => 'TwoPhaseCommit',
       initialcapacity            => '1',
-      jndinames                  => 'jdbc/hrDS',
+      jndinames                  => ['jdbc/hrDS'],
       maxcapacity                => '15',
-      target                     => 'WebCluster,WebCluster2',
-      targettype                 => 'Cluster,Cluster',
+      target                     => ['WebCluster','WebCluster2'],
+      targettype                 => ['Cluster','Cluster'],
       testtablename              => 'SQL SELECT 1 FROM DUAL',
       url                        => 'jdbc:oracle:thin:@dbagent2.alfa.local:1521/test.oracle.com',
       user                       => 'hr',
@@ -2274,10 +2396,10 @@ or use puppet resource wls_datasource
       drivername                 => 'com.mysql.jdbc.Driver',
       globaltransactionsprotocol => 'None',
       initialcapacity            => '1',
-      jndinames                  => 'jmsDS',
+      jndinames                  => ['jmsDS'],
       maxcapacity                => '15',
-      target                     => 'WebCluster',
-      targettype                 => 'Cluster',
+      target                     => ['WebCluster'],
+      targettype                 => ['Cluster'],
       testtablename              => 'SQL SELECT 1',
       url                        => 'jdbc:mysql://10.10.10.10:3306/jms',
       user                       => 'jms',
@@ -2290,14 +2412,23 @@ in hiera
         'hrDS':
           ensure:                      'present'
           drivername:                  'oracle.jdbc.xa.client.OracleXADataSource'
-          extraproperties:             'SendStreamAsBlob,oracle.net.CONNECT_TIMEOUT'
-          extrapropertiesvalues:       'true,10000'
+          extraproperties:             
+            - 'SendStreamAsBlob'
+            - 'oracle.net.CONNECT_TIMEOUT'
+          extrapropertiesvalues:       
+            - 'true'
+            - '10000'
           globaltransactionsprotocol:  'TwoPhaseCommit'
           initialcapacity:             '1'
-          jndinames:                   'jdbc/hrDS'
+          jndinames:                   
+           - 'jdbc/hrDS'
           maxcapacity:                 '15'
-          target:                      'WebCluster,WebCluster2'
-          targettype:                  'Cluster,Cluster'
+          target:                      
+            - 'WebCluster'
+            - 'WebCluster2'
+          targettype:                  
+            - 'Cluster'
+            - 'Cluster'
           testtablename:               'SQL SELECT 1 FROM DUAL'
           url:                         "jdbc:oracle:thin:@dbagent2.alfa.local:1521/test.oracle.com"
           user:                        'hr'
@@ -2307,10 +2438,13 @@ in hiera
           drivername:                  'com.mysql.jdbc.Driver'
           globaltransactionsprotocol:  'None'
           initialcapacity:             '1'
-          jndinames:                   'jmsDS'
+          jndinames:                   
+            - 'jmsDS'
           maxcapacity:                 '15'
-          target:                      'WebCluster'
-          targettype:                  'Cluster'
+          target:                      
+           - 'WebCluster'
+          targettype:                  
+           - 'Cluster'
           testtablename:               'SQL SELECT 1'
           url:                         'jdbc:mysql://10.10.10.10:3306/jms'
           user:                        'jms'
@@ -2325,8 +2459,8 @@ or use puppet resource wls_jms_module
 
     wls_jms_module { 'jmsClusterModule':
       ensure     => 'present',
-      target     => 'WebCluster',
-      targettype => 'Cluster',
+      target     => ['WebCluster'],
+      targettype => ['Cluster'],
     }
 
 in hiera
@@ -2334,8 +2468,10 @@ in hiera
     jms_module_instances:
        jmsClusterModule:
          ensure:      'present'
-         target:      'WebCluster'
-         targettype:  'Cluster'
+         target:      
+           - 'WebCluster'
+         targettype:  
+           - 'Cluster'
 
 
 ###wls_connection_factory
@@ -2548,13 +2684,13 @@ or use puppet resource wls_jms_subdeployment
 
     wls_jms_subdeployment { 'jmsClusterModule:jmsServers':
       ensure     => 'present',
-      target     => 'jmsServer1,jmsServer2',
-      targettype => 'JMSServer,JMSServer',
+      target     => ['jmsServer1','jmsServer2'],
+      targettype => ['JMSServer','JMSServer'],
     }
     wls_jms_subdeployment { 'jmsClusterModule:wlsServers':
       ensure     => 'present',
-      target     => 'WebCluster',
-      targettype => 'Cluster',
+      target     => ['WebCluster'],
+      targettype => ['Cluster'],
     }
 
 in hiera
@@ -2562,12 +2698,18 @@ in hiera
     jms_subdeployment_instances:
        'jmsClusterModule:jmsServers':
           ensure:     'present'
-          target:     'jmsServer1,jmsServer2'
-          targettype: 'JMSServer,JMSServer'
+          target:     
+           - 'jmsServer1'
+           - 'jmsServer2'
+          targettype: 
+          - 'JMSServer'
+          - 'JMSServer'
        'jmsClusterModule:wlsServers':
           ensure:     'present'
-          target:     'WebCluster'
-          targettype: 'Cluster'
+          target:     
+           - 'WebCluster'
+          targettype: 
+           - 'Cluster'
     
 
 ###wls_saf_remote_context
@@ -2721,15 +2863,15 @@ or use puppet resource wls_foreign_server
       ensure                => 'present',
       defaulttargeting      => '1',
       extraproperties       => 'datasource',
-      extrapropertiesvalues => 'jdbc/hrDS',
-      initialcontextfactory => 'oracle.jms.AQjmsInitialContextFactory',
+      extrapropertiesvalues => ['jdbc/hrDS'],
+      initialcontextfactory => ['oracle.jms.AQjmsInitialContextFactory'],
     }
     wls_foreign_server { 'jmsClusterModule:Jboss':
       ensure                => 'present',
       connectionurl         => 'remote://10.10.10.10:4447',
       defaulttargeting      => '0',
-      extraproperties       => 'java.naming.security.principal',
-      extrapropertiesvalues => 'jmsuser',
+      extraproperties       => ['java.naming.security.principal'],
+      extrapropertiesvalues => ['jmsuser'],
       initialcontextfactory => 'org.jboss.naming.remote.client.InitialContextFactory',
       subdeployment         => 'wlsServers',
     }
@@ -2739,15 +2881,19 @@ in hiera
     'jmsClusterModule:AQForeignServer':
         ensure:                'present'
         defaulttargeting:      '1'
-        extraproperties:       'datasource'
-        extrapropertiesvalues: 'jdbc/hrDS'
+        extraproperties:       
+          - 'datasource'
+        extrapropertiesvalues: 
+          - 'jdbc/hrDS'
         initialcontextfactory: 'oracle.jms.AQjmsInitialContextFactory'
     'jmsClusterModule:Jboss':
         ensure:                'present'
         connectionurl:         'remote://10.10.10.10:4447'
         defaulttargeting:      '0'
-        extraproperties:       'java.naming.security.principal'
-        extrapropertiesvalues: 'jmsuser'
+        extraproperties:       
+          - 'java.naming.security.principal'
+        extrapropertiesvalues: 
+          - 'jmsuser'
         initialcontextfactory: 'org.jboss.naming.remote.client.InitialContextFactory'
         subdeployment:         'wlsServers'
         password:              'test'
