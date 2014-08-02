@@ -150,6 +150,14 @@ managed_servers_instances:
          sslhostnameverificationignored: '1'
          jsseenabled:                    '1' 
 
+fmwlogdir_instances:
+  'AdminServer':
+     log_output:      true
+     server:          'AdminServer'
+  'WebServer1':
+     log_output:      true
+     server:          'WebServer1'
+
 # create cluster and assign the managed servers
 cluster_instances:
       'WebCluster':
