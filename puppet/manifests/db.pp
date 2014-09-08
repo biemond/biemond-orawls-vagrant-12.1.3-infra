@@ -1,36 +1,36 @@
-node 'wlsdb.example.com' {
+node 'wlsdb' {
   include oradb_os
   include oradb_11g
-} 
+}
 
 # operating settings for Database & Middleware
 class oradb_os {
 
-  exec { "create swap file":
-    command => "/bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=8192",
-    creates => "/var/swap.1",
-  }
+  # exec { "create swap file":
+  #   command => "/bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=8192",
+  #   creates => "/var/swap.1",
+  # }
 
-  exec { "attach swap file":
-    command => "/sbin/mkswap /var/swap.1 && /sbin/swapon /var/swap.1",
-    require => Exec["create swap file"],
-    unless => "/sbin/swapon -s | grep /var/swap.1",
-  }
+  # exec { "attach swap file":
+  #   command => "/sbin/mkswap /var/swap.1 && /sbin/swapon /var/swap.1",
+  #   require => Exec["create swap file"],
+  #   unless => "/sbin/swapon -s | grep /var/swap.1",
+  # }
 
-  #add swap file entry to fstab
-  exec {"add swapfile entry to fstab":
-    command => "/bin/echo >>/etc/fstab /var/swap.1 swap swap defaults 0 0",
-    require => Exec["attach swap file"],
-    user => root,
-    unless => "/bin/grep '^/var/swap.1' /etc/fstab 2>/dev/null",
-  }
+  # #add swap file entry to fstab
+  # exec {"add swapfile entry to fstab":
+  #   command => "/bin/echo >>/etc/fstab /var/swap.1 swap swap defaults 0 0",
+  #   require => Exec["attach swap file"],
+  #   user => root,
+  #   unless => "/bin/grep '^/var/swap.1' /etc/fstab 2>/dev/null",
+  # }
 
   $host_instances = hiera('hosts', {})
   create_resources('host',$host_instances)
 
   service { iptables:
-    enable    => false,
     ensure    => false,
+    enable    => false,
     hasstatus => true,
   }
 
@@ -43,7 +43,7 @@ class oradb_os {
   user { 'oracle' :
     ensure      => present,
     uid         => 500,
-    gid         => 'oinstall',  
+    gid         => 'oinstall',
     groups      => $groups,
     shell       => '/bin/bash',
     password    => '$1$DSJ51vh6$4XzzwyIOk6Bi/54kglGk3.',
@@ -54,25 +54,25 @@ class oradb_os {
   }
 
   $install = [ 'binutils.x86_64', 'compat-libstdc++-33.x86_64', 'glibc.x86_64','ksh.x86_64','libaio.x86_64',
-               'libgcc.x86_64', 'libstdc++.x86_64', 'make.x86_64','compat-libcap1.x86_64', 'gcc.x86_64',
-               'gcc-c++.x86_64','glibc-devel.x86_64','libaio-devel.x86_64','libstdc++-devel.x86_64',
-               'sysstat.x86_64','unixODBC-devel','glibc.i686','libXext.i686','libXtst.i686']
-       
+              'libgcc.x86_64', 'libstdc++.x86_64', 'make.x86_64','compat-libcap1.x86_64', 'gcc.x86_64',
+              'gcc-c++.x86_64','glibc-devel.x86_64','libaio-devel.x86_64','libstdc++-devel.x86_64',
+              'sysstat.x86_64','unixODBC-devel','glibc.i686','libXext.i686','libXtst.i686']
+
 
   package { $install:
     ensure  => present,
   }
 
   class { 'limits':
-     config => {
+    config    => {
                 '*'       => { 'nofile'  => { soft => '2048'   , hard => '8192',   },},
                 'oracle'  => { 'nofile'  => { soft => '65536'  , hard => '65536',  },
                                 'nproc'  => { soft => '2048'   , hard => '16384',  },
                                 'stack'  => { soft => '10240'  ,},},
                 },
-     use_hiera => false,
+    use_hiera => false,
   }
- 
+
   sysctl { 'kernel.msgmnb':                 ensure => 'present', permanent => 'yes', value => '65536',}
   sysctl { 'kernel.msgmax':                 ensure => 'present', permanent => 'yes', value => '65536',}
   sysctl { 'kernel.shmmax':                 ensure => 'present', permanent => 'yes', value => '2588483584',}
@@ -109,7 +109,7 @@ class oradb_11g {
       group_oper             => 'oper',
       downloadDir            => hiera('oracle_download_dir'),
       remoteFile             => false,
-      puppetDownloadMntPoint => hiera('oracle_source'),  
+      puppetDownloadMntPoint => hiera('oracle_source'),
     }
 
     oradb::net{ 'config net8':
@@ -126,11 +126,11 @@ class oradb_11g {
       oracleHome   => hiera('oracle_home_dir'),
       user         => hiera('oracle_os_user'),
       group        => hiera('oracle_os_group'),
-      action       => 'start',  
+      action       => 'start',
       require      => Oradb::Net['config net8'],
     }
 
-    oradb::database{ 'oraDb': 
+    oradb::database{ 'oraDb':
       oracleBase              => hiera('oracle_base_dir'),
       oracleHome              => hiera('oracle_home_dir'),
       version                 => '11.2',
@@ -150,11 +150,11 @@ class oradb_11g {
       sampleSchema            => 'FALSE',
       memoryPercentage        => "40",
       memoryTotal             => "800",
-      databaseType            => "MULTIPURPOSE",                         
+      databaseType            => "MULTIPURPOSE",
       require                 => Oradb::Listener['start listener'],
     }
 
-    oradb::dbactions{ 'start oraDb': 
+    oradb::dbactions{ 'start oraDb':
       oracleHome              => hiera('oracle_home_dir'),
       user                    => hiera('oracle_os_user'),
       group                   => hiera('oracle_os_group'),
@@ -163,7 +163,7 @@ class oradb_11g {
       require                 => Oradb::Database['oraDb'],
     }
 
-    oradb::autostartdatabase{ 'autostart oracle': 
+    oradb::autostartdatabase{ 'autostart oracle':
       oracleHome              => hiera('oracle_home_dir'),
       user                    => hiera('oracle_os_user'),
       dbName                  => hiera('oracle_database_name'),

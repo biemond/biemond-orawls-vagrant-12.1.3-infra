@@ -41,8 +41,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "wlsdb" , primary: true do |wlsdb|
-    wlsdb.vm.box = "centos-6.5-x86_64"
-    wlsdb.vm.box_url = "https://dl.dropboxusercontent.com/s/np39xdpw05wfmv4/centos-6.5-x86_64.box"
+    #wlsdb.vm.box = "centos-6.5-x86_64"
+    #wlsdb.vm.box_url = "https://dl.dropboxusercontent.com/s/np39xdpw05wfmv4/centos-6.5-x86_64.box"
+
+    wlsdb.vm.box = "centos-7.0-x86_64"
+    wlsdb.vm.box_url = "https://dl.dropboxusercontent.com/s/2w877odvrzj6v9x/centos-7.0-x86_64.box"
 
     wlsdb.vm.hostname = "wlsdb.example.com"
     wlsdb.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=777","fmode=777"]
@@ -63,7 +66,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       puppet.manifests_path    = "puppet/manifests"
       puppet.module_path       = "puppet/modules"
       puppet.manifest_file     = "db.pp"
-      puppet.options           = "--verbose --hiera_config /vagrant/puppet/hiera.yaml"
+      puppet.options           = [
+                                  '--verbose',
+                                  '--report',
+#                                  '--debug',
+                                  '--parser future',
+                                  '--strict_variables',
+                                  '--hiera_config /vagrant/puppet/hiera.yaml'
+                                 ]
+
   
       puppet.facter = {
         "environment" => "development",
