@@ -1,6 +1,15 @@
 # History
 
+## 1.0.18
+- small fix for the server_template type with the arguments parameter
+- Frontend parameters for wls_cluster
+- Option to skip RCU with a domain creation ( weblogic > 12.1.2)
+- new WebLogic type wls_mail_session
+- new parameter default file store with wls_server
+
 ## 1.0.17
+- utils.py fix for multiple domains
+- Refactor for rubocop warnings
 
 ## 1.0.16
 - Gridlink support for the Datasource type
