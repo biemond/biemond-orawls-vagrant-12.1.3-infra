@@ -115,6 +115,15 @@ all templates creates a WebLogic domain, logs the domain creation output
 - domain 'oud'         -> OUD (Oracle Unified Directory)
 
 
+## Puppet master with orawls module key points
+it should work on every PE or opensource puppet master, customers and I succesfull tested orawls on PE 3.0, 3.1, 3.2, 3.3. See also the puppet master vagrant box
+
+But when it fails you can do the following actions.
+- Update orawls and its dependencies on the puppet master.
+- After adding or refreshing the easy_type or orawls modules you need to restart all the PE services on the puppet master (this will flush the PE cache) and always do a puppet agent run on the Puppet master
+- To solve this error "no such file to load -- easy_type" you need just to do a puppet run on the puppet master when it is still failing you can move the easy_type module to its primary module location ( /etc/puppetlabs/puppet/module )
+
+
 ## Orawls WebLogic Facter
 
 Contains WebLogic Facter which displays the following
@@ -1498,6 +1507,8 @@ __orawls::oud::control__ Stop or start an OUD (Oracle Unified Directory) ldap in
 
 All wls types needs a wls_setting definition, this is a pointer to an WebLogic AdminServer and you need to create one for every WebLogic domain. When you don't provide a wls_setting identifier in the title of the weblogic type then it will use default as identifier.
 
+Global timeout parameter for WebLogic resource types. use timeout and value in seconds, default = 120 seconds or 2 minutes
+
 ###wls_setting
 
 required for all the weblogic type/providers, this is a pointer to an WebLogic AdminServer.
@@ -1713,6 +1724,7 @@ or use puppet resource wls_deployment
       targettype        => ['Server','Cluster'],
       versionidentifier => '1.18@1.18.0.0',
       localpath         =>  '/vagrant/jersey-bundle-1.18.war',
+      timeout           => 60,
     }
     # this will use default as wls_setting identifier
     wls_deployment { 'webapp':
@@ -1721,6 +1733,7 @@ or use puppet resource wls_deployment
       target            => ['WebCluster'],
       targettype        => ['Cluster'],
       localpath         => '/vagrant/webapp.war',
+      timeout           => 60,
     }
 
 or add a version
@@ -1881,6 +1894,8 @@ only control_flag is a property, the rest are parameters and only used in a crea
 
 to provide a list of token types to create provide a "::" seperated list for attribute 'ActiveTypes'
 
+Optionally, providers can be ordered by providing a value to the order paramater, which is a zero-based list. When configuring ordering order, it may be necessary to create the resources with Puppet ordering (if not using Hiera) or by structuring Hiera in matching order. Otherwise ordering may fail if not all authentication providers are created yet.
+
 or use puppet resource wls_authentication_provider
 
 
@@ -1895,13 +1910,15 @@ or use puppet resource wls_authentication_provider
       attributes:       =>  'DigestReplayDetectionEnabled;UseDefaultUserNameMapper;DefaultUserNameMapperAttributeType;ActiveTypes',
       attributesvalues  =>  '1;1;CN;AuthenticatedUser::X.509',
     }
-    # this will use default as wls_setting identifier
+
+    # this provider will be ordered first in the providers list
     wls_authentication_provider { 'ldap':
       ensure            => 'present',
       control_flag      => 'SUFFICIENT',
       providerclassname => 'weblogic.security.providers.authentication.LDAPAuthenticator',
       attributes:       =>  'Principal;Host;Port;CacheTTL;CacheSize;MaxGroupMembershipSearchLevel;SSLEnabled',
-      attributesvalues  =>  'ldapuser;ldapserver;389;60;1024;4;true',
+      attributesvalues  =>  'ldapuser;ldapserver;389;60;1024;4;1',
+      order             =>  '0'
     }
 
 
@@ -1921,12 +1938,15 @@ in hiera
         providerclassname:  'weblogic.security.providers.authentication.DefaultIdentityAsserter'
         attributes:         'DigestReplayDetectionEnabled;UseDefaultUserNameMapper;DefaultUserNameMapperAttributeType;ActiveTypes'
         attributesvalues:   '1;1;CN;AuthenticatedUser::X.509'
+
+      #ldap will be the first listed provider
       'ldap':
         ensure:             'present'
         control_flag:       'SUFFICIENT'
         providerclassname:  'weblogic.security.providers.authentication.LDAPAuthenticator'
         attributes:         'Principal;Host;Port;CacheTTL;CacheSize;MaxGroupMembershipSearchLevel;SSLEnabled'
-        attributesvalues:   'ldapuser;ldapserver;389;60;1024;4;true'
+        attributesvalues:   'ldapuser;ldapserver;389;60;1024;4;1'
+        order:              '0'
 
 
 
@@ -2012,6 +2032,7 @@ or with log parameters, default file store and ssl
       two_way_ssl                       => '0',
       client_certificate_enforced       => '0',
       default_file_store                => '/path/to/default_file_store/',
+      max_message_size                  => '25000000',
     }
 
 or with JSSE with custom identity and trust
@@ -2042,6 +2063,7 @@ or with JSSE with custom identity and trust
       custom_identity_privatekey_passphrase => 'welcome',
       trust_keystore_file                   => '/vagrant/truststore.jks',
       trust_keystore_passphrase             => 'welcome',
+      max_message_size                      => '25000000',
     }
 
 
@@ -2084,6 +2106,8 @@ or with log parameters
         sslhostnameverificationignored:        '1'
         jsseenabled:                           '1'
         default_file_store:                    '/path/to/default_file_store/'
+        max_message_size:                      '25000000'
+
 
 
 You can also pass server arguments as an array, as it makes it easier to use references in YAML.
@@ -2643,8 +2667,7 @@ or use puppet resource wls_datasource
     wls_datasource { 'hrDS':
       ensure                     => 'present',
       drivername                 => 'oracle.jdbc.xa.client.OracleXADataSource',
-      extraproperties            => ['SendStreamAsBlob','oracle.net.CONNECT_TIMEOUT'],
-      extrapropertiesvalues      => ['true','10000'],
+      extraproperties            => ['SendStreamAsBlob=true','oracle.net.CONNECT_TIMEOUT=10000'],
       globaltransactionsprotocol => 'TwoPhaseCommit',
       initialcapacity            => '1',
       jndinames                  => ['jdbc/hrDS'],
@@ -2684,11 +2707,8 @@ in hiera
           ensure:                      'present'
           drivername:                  'oracle.jdbc.xa.client.OracleXADataSource'
           extraproperties:
-            - 'SendStreamAsBlob'
-            - 'oracle.net.CONNECT_TIMEOUT'
-          extrapropertiesvalues:
-            - 'true'
-            - '10000'
+            - 'SendStreamAsBlob=true'
+            - 'oracle.net.CONNECT_TIMEOUT=1000'
           globaltransactionsprotocol:  'TwoPhaseCommit'
           initialcapacity:             '1'
           jndinames:
@@ -3137,16 +3157,14 @@ or use puppet resource wls_foreign_server
     wls_foreign_server { 'jmsClusterModule:AQForeignServer':
       ensure                => 'present',
       defaulttargeting      => '1',
-      extraproperties       => 'datasource',
-      extrapropertiesvalues => ['jdbc/hrDS'],
+      extraproperties       => 'datasource=jdbc/hrDS',
       initialcontextfactory => ['oracle.jms.AQjmsInitialContextFactory'],
     }
     wls_foreign_server { 'jmsClusterModule:Jboss':
       ensure                => 'present',
       connectionurl         => 'remote://10.10.10.10:4447',
       defaulttargeting      => '0',
-      extraproperties       => ['java.naming.security.principal'],
-      extrapropertiesvalues => ['jmsuser'],
+      extraproperties       => ['java.naming.security.principal=jmsuser'],
       initialcontextfactory => 'org.jboss.naming.remote.client.InitialContextFactory',
       subdeployment         => 'wlsServers',
     }
@@ -3157,18 +3175,14 @@ in hiera
         ensure:                'present'
         defaulttargeting:      '1'
         extraproperties:
-          - 'datasource'
-        extrapropertiesvalues:
-          - 'jdbc/hrDS'
+          - 'datasource=jdbc/hrDS'
         initialcontextfactory: 'oracle.jms.AQjmsInitialContextFactory'
     'jmsClusterModule:Jboss':
         ensure:                'present'
         connectionurl:         'remote://10.10.10.10:4447'
         defaulttargeting:      '0'
         extraproperties:
-          - 'java.naming.security.principal'
-        extrapropertiesvalues:
-          - 'jmsuser'
+          - 'java.naming.security.principal=jmsuser'
         initialcontextfactory: 'org.jboss.naming.remote.client.InitialContextFactory'
         subdeployment:         'wlsServers'
         password:              'test'
@@ -3230,8 +3244,7 @@ Valid mail properties are found at: https://javamail.java.net/nonav/docs/api/
       jndiname       => 'myMailSession',
       target         => ['ManagedServer1', 'WebCluster'],
       targettype     => ['Server', 'Cluster'],
-      mailpropertynames => ['mail.host', 'mail.user'],
-      mailpropertyvalues => ['smtp.hostname.com', 'smtpadmin'],
+      mailproperty   => ['mail.host=smtp.hostname.com', 'mail.user=smtpadmin'],
     }
 
 
@@ -3247,9 +3260,6 @@ in hiera
         targettype:
          - 'Server'
          - 'Cluster'
-        mailpropertynames:
-         - 'mail.host'
-         - 'mail.user'
-        mailpropertyvalues:
-         - 'smtp.hostname.com'
-         - 'smtpadmin'
+        mailproperty:
+         - 'mail.host=smtp.hostname.com'
+         - 'mail.user=smtpadmin'
