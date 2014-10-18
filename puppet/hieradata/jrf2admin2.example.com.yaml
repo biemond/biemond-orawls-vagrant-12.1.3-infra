@@ -76,6 +76,7 @@ wls_setting_instances:
     connect_url:        "t3://10.10.10.21:7001"
     weblogic_user:      *wls_weblogic_user
     weblogic_password:  *domain_wls_password
+    post_classpath:     '/opt/oracle/middleware12c/oracle_common/modules/internal/features/jrf_wlsFmw_oracle.jrf.wlst_12.1.3.jar'
     require:            Orawls::Domain[adf_domain]
 
 
@@ -103,11 +104,10 @@ userconfig_instances:
 
 
 authentication_provider_instances:
-  # 'DefaultAuthenticator':
-  #   ensure:             'present'
-  #   control_flag:       'SUFFICIENT'
-  #   order:              '0'
-  #   before:             Wls_domain[adf_domain]
+  'DefaultAuthenticator':
+    ensure:             'present'
+    control_flag:       'SUFFICIENT'
+    before:             Wls_domain[adf_domain]
 
 wls_domain_instances:
   'adf_domain':
