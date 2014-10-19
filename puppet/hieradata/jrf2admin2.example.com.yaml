@@ -102,7 +102,6 @@ userconfig_instances:
      log_output:           *logoutput
      user_config_dir:      '/home/oracle'
 
-
 authentication_provider_instances:
   'DefaultAuthenticator':
     ensure:             'present'
@@ -141,20 +140,6 @@ wls_adminserver_instances:
     refreshonly:               true
     subscribe:                 Wls_domain[adf_domain]
 
-
-# fmw cluster
-fmw_jrf_cluster_instances:
-  'WebCluster':
-     domain_name:          "adf_domain"
-     jrf_target_name:      "WebCluster"
-     log_output:           *logoutput
-
-
-webtier_instances:
-  'ohs1':
-    action_name:           'create'
-    instance_name:         'ohs1'
-    machine_name:          'Node1'
 
 # create 2 machines
 machines_instances:
@@ -208,15 +193,6 @@ server_instances:
      jsseenabled:                    '1'
      require:                        Wls_machine[Node1]
 
-fmwlogdir_instances:
-  'AdminServer':
-     log_output:      true
-     server:          'AdminServer'
-     require:         Orawls::Utils::Fmwclusterjrf[WebCluster]
-  'WebServer1':
-     log_output:      true
-     server:          'WebServer1'
-     require:         Orawls::Utils::Fmwclusterjrf[WebCluster]
 
 # create cluster and assign the managed servers
 cluster_instances:
@@ -236,6 +212,34 @@ cluster_instances:
       - 'JmsWlsServer1'
     require:
       - Wls_server[JmsWlsServer1]
+
+
+# fmw cluster
+fmw_jrf_cluster_instances:
+  'WebCluster':
+     domain_name:          "adf_domain"
+     jrf_target_name:      "WebCluster"
+     opss_datasource_name: "opss-data-source"
+     log_output:           *logoutput
+
+fmwlogdir_instances:
+  'AdminServer':
+     log_output:      true
+     server:          'AdminServer'
+     require:         Orawls::Utils::Fmwclusterjrf[WebCluster]
+  'WebServer1':
+     log_output:      true
+     server:          'WebServer1'
+     require:         Orawls::Utils::Fmwclusterjrf[WebCluster]
+
+
+webtier_instances:
+  'ohs1':
+    action_name:           'create'
+    instance_name:         'ohs1'
+    machine_name:          'Node1'
+
+
 
 file_persistence_folders:
    '/opt/oracle/wlsdomains/domains/adf_domain/JmsPersistence1':
