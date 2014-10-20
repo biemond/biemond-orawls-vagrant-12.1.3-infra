@@ -155,6 +155,22 @@ class opatch{
 class domains{
   require orawls::weblogic, opatch
 
+  # orawls::utils::rcu{ "RCU_12c DEV":
+  #   fmw_product                 => "adf",
+  #   oracle_fmw_product_home_dir => "/opt/oracle/middleware12c/oracle_common",
+  #   jdk_home_dir                => "/usr/java/latest",
+  #   os_user                     => 'oracle',
+  #   os_group                    => 'dba',
+  #   download_dir                => "/var/tmp/install",
+  #   rcu_action                  => 'create',
+  #   rcu_jdbc_url                => "jdbc:oracle:thin:@wlsdb.example.com:1521/wlsrepos.example.com",
+  #   rcu_database_url            => "wlsdb.example.com:1521:wlsrepos.example.com",
+  #   rcu_sys_password            => 'Welcome01',
+  #   rcu_prefix                  => 'DEV',
+  #   rcu_password                => 'Welcome01',
+  #   log_output                  => true,
+  # }
+
   $default_params = {}
   $domain_instances = hiera('domain_instances', {})
   create_resources('orawls::domain',$domain_instances, $default_params)
