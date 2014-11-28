@@ -187,9 +187,6 @@ server_instances:
      listenport:                     '8021'
      logfilename:                    '/var/log/weblogic/JmsWlsServer1.log'
      machine:                        'Node1'
-     sslenabled:                     '1'
-     ssllistenport:                  '8022'
-     sslhostnameverificationignored: '1'
      jsseenabled:                    '1'
      require:                        Wls_machine[Node1]
 
