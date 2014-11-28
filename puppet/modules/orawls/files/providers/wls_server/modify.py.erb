@@ -62,6 +62,8 @@ try:
 
     if listenAddress and not listenAddress.isspace():
       set('ListenAddress',listenAddress)
+    else:
+      set('ListenAddress',None)
 
     if listenPort:
       set('ListenPort', int(listenPort))
@@ -71,9 +73,13 @@ try:
 
     if classpath:
       set('ServerStart/'+name+'/ClassPath', classpath)
+    else:
+      set('ServerStart/'+name+'/ClassPath', None)
 
     if arguments:
       set('ServerStart/'+name+'/Arguments', arguments)
+    else:
+      set('ServerStart/'+name+'/Arguments', None)
 
     if tunnelingenabled:
       set('TunnelingEnabled', formatBoolean(tunnelingenabled))
