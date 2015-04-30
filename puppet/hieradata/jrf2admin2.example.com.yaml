@@ -196,7 +196,7 @@ cluster_instances:
   'WebCluster':
     ensure:         'present'
     messagingmode:  'unicast'
-    migrationbasis: 'consensus'
+    migrationbasis: 'database'
     servers:
       - 'WebServer1'
     require:
@@ -204,7 +204,7 @@ cluster_instances:
   'JmsCluster':
     ensure:         'present'
     messagingmode:  'unicast'
-    migrationbasis: 'consensus'
+    migrationbasis: 'database'
     servers:
       - 'JmsWlsServer1'
     require:
