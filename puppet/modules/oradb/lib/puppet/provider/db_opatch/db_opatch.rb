@@ -1,6 +1,4 @@
-
 Puppet::Type.type(:db_opatch).provide(:db_opatch) do
-
   def self.instances
     []
   end
@@ -11,9 +9,9 @@ Puppet::Type.type(:db_opatch).provide(:db_opatch) do
     oracle_product_home_dir = resource[:oracle_product_home_dir]
     extracted_patch_dir     = resource[:extracted_patch_dir]
     ocmrf_file              = resource[:ocmrf_file]
-    clusterware             = resource[:clusterware]
+    opatch_auto             = resource[:opatch_auto]
 
-    Puppet.debug "clusterware result: #{clusterware}"
+    Puppet.debug "opatch auto result: #{opatch_auto}"
 
     unless ocmrf_file.nil?
       ocmrf = ' -ocmrf ' + ocmrf_file
@@ -21,7 +19,7 @@ Puppet::Type.type(:db_opatch).provide(:db_opatch) do
       ocmrf = ''
     end
 
-    if clusterware == false
+    if opatch_auto == false
       if action == :present
         command = "#{oracle_product_home_dir}/OPatch/opatch apply -silent #{ocmrf} -oh #{oracle_product_home_dir} #{extracted_patch_dir}"
       else
@@ -36,12 +34,11 @@ Puppet::Type.type(:db_opatch).provide(:db_opatch) do
     end
 
     Puppet.debug "opatch action: #{action} with command #{command}"
-    if clusterware == true
-      output = `su -c '#{command}'`
+    if opatch_auto == true
+      output = `export ORACLE_HOME=#{oracle_product_home_dir}; cd #{oracle_product_home_dir}; #{command}`
     else
-      output = `su - #{user} -c '#{command}'`
+      output = `su - #{user} -c 'export ORACLE_HOME=#{oracle_product_home_dir}; cd #{oracle_product_home_dir}; #{command}'`
     end
-    # output = execute command, :failonfail => true ,:uid => user
     Puppet.info "opatch result: #{output}"
 
     result = false
@@ -61,9 +58,9 @@ Puppet::Type.type(:db_opatch).provide(:db_opatch) do
     oracle_product_home_dir = resource[:oracle_product_home_dir]
     orainst_dir             = resource[:orainst_dir]
     bundle_sub_patch_id     = resource[:bundle_sub_patch_id]
-    clusterware             = resource[:clusterware]
+    opatch_auto             = resource[:opatch_auto]
 
-    if clusterware == true
+    unless bundle_sub_patch_id.nil?
       patchId = bundle_sub_patch_id
     else
       patchId = patchName
@@ -78,7 +75,7 @@ Puppet::Type.type(:db_opatch).provide(:db_opatch) do
     Puppet.debug "#{output}"
     # output = execute command, :failonfail => true ,:uid => user
     output.each_line do |li|
-      opatch = li[5, li.index(':')-5 ].strip + ';' if (li['Patch'] and li[': applied on'])
+      opatch = li[5, li.index(':') - 5].strip + ';' if (li['Patch'] and li[': applied on'])
       unless opatch.nil?
         Puppet.debug "line #{opatch}"
         if opatch.include? patchId
@@ -103,9 +100,9 @@ Puppet::Type.type(:db_opatch).provide(:db_opatch) do
 
     patchName               = resource[:patch_id]
     bundle_sub_patch_id     = resource[:bundle_sub_patch_id]
-    clusterware             = resource[:clusterware]
+    opatch_auto             = resource[:opatch_auto]
 
-    if clusterware == true
+    unless bundle_sub_patch_id.nil?
       patchId = bundle_sub_patch_id
     else
       patchId = patchName

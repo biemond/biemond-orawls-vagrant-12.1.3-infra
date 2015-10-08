@@ -1,12 +1,9 @@
-require 'easy_type'
-require 'utils/wls_access'
-require 'utils/settings'
-require 'utils/title_parser'
-require 'facter'
+require File.dirname(__FILE__) + '/../../orawls_core'
+
 
 module Puppet
   #
-  newtype(:wls_jms_connection_factory) do
+  Type.newtype(:wls_jms_connection_factory) do
     include EasyType
     include Utils::WlsAccess
     extend Utils::TitleParser
@@ -44,6 +41,7 @@ module Puppet
     parameter :connection_factory_name
     parameter :timeout
     property :jndiname
+    property :localjndiname
     property :subdeployment
     property :defaulttargeting
     property :transactiontimeout
@@ -55,6 +53,8 @@ module Puppet
     property :loadbalancingenabled
     property :serveraffinityenabled
     property :attachjmsxuserid
+    property :defaultdeliverymode
+    property :defaultredeliverydelay
 
     add_title_attributes(:jmsmodule, :connection_factory_name) do
       /^((.*\/)?(.*):(.*)?)$/

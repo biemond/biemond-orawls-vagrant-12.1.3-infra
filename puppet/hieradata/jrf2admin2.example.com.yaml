@@ -17,19 +17,16 @@ orawls::weblogic::filename:             "fmw_12.1.3.0.0_infrastructure.jar"
 orawls::weblogic::middleware_home_dir:  *wls_middleware_home_dir
 orawls::weblogic::fmw_infra:            true
 
-orautils::osMdwHomeParam:         *wls_middleware_home_dir
-orautils::osWlHomeParam:          *wls_weblogic_home_dir
 
-orautils::osDomainTypeParam:      "admin"
-orautils::osDomainParam:          "adf_domain"
-orautils::osDomainPathParam:      "/opt/oracle/wlsdomains/domains/adf_domain"
-orautils::nodeMgrPathParam:       "/opt/oracle/wlsdomains/domains/adf_domain/bin"
+orautils::os_domain:           "adf_domain"
+orautils::os_domain_path:      "/opt/oracle/wlsdomains/domains/adf_domain"
+orautils::node_mgr_path:       "/opt/oracle/wlsdomains/domains/adf_domain/bin"
+orautils::node_mgr_address:    '10.10.10.21'
+orautils::node_mgr_port:       5556
+orautils::wls_password:        "weblogic1"
+orautils::wls_adminserver:     "AdminServer"
 
-orautils::nodeMgrPortParam:       5556
-orautils::nodeMgrAddressParam:    '10.10.10.21'
-orautils::wlsUserParam:           "weblogic"
-orautils::wlsPasswordParam:       "weblogic1"
-orautils::wlsAdminServerParam:    "AdminServer"
+
 
 logoutput:                     &logoutput                     true
 
@@ -209,6 +206,40 @@ cluster_instances:
       - 'JmsWlsServer1'
     require:
       - Wls_server[JmsWlsServer1]
+
+datasource_instances:
+    'tlogDS':
+      ensure:                      'present'
+      drivername:                  'oracle.jdbc.OracleDriver'
+      globaltransactionsprotocol:  'None'
+      initialcapacity:             '2'
+      jndinames:
+        - 'jdbc/tlogDS'
+      maxcapacity:                 '15'
+      target:
+        - 'WebServer1'
+        - 'JmsWlsServer1'
+      targettype:
+        - 'Server'
+        - 'Server'
+      testtablename:               'SQL SELECT 1 FROM DUAL'
+      url:                         "jdbc:oracle:thin:@wlsdb.example.com:1521/wlsrepos.example.com"
+      user:                        'tlog'
+      password:                    'tlog'
+      usexa:                       '1'
+
+server_tlog_instances:
+  'JmsWlsServer1':
+      ensure:                      'present'
+      tlog_enabled:                'true'
+      tlog_datasource:             'tlogDS'
+      tlog_datasource_prefix:      'TLOG_JmsWlsServer1_'
+  'WebServer1':
+      ensure:                      'present'
+      tlog_enabled:                'true'
+      tlog_datasource:             'tlogDS'
+      tlog_datasource_prefix:      'TLOG_WebServer1_'
+
 
 
 # fmw cluster

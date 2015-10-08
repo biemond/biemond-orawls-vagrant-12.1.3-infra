@@ -6,6 +6,7 @@ real_domain='<%= domain %>'
 name                       = '<%= connection_factory_name %>'
 jmsmodule                  = '<%= jmsmodule %>'
 jndiname                   = '<%= jndiname %>'
+localjndiname              = '<%= localjndiname %>'
 subdeployment              = '<%= subdeployment %>'
 defaulttargeting           = '<%= defaulttargeting %>'
 xaenabled                  = '<%= xaenabled %>'
@@ -17,6 +18,14 @@ reconnectpolicy            = '<%= reconnectpolicy %>'
 loadbalancingenabled       = '<%= loadbalancingenabled %>'
 serveraffinityenabled      = '<%= serveraffinityenabled %>'
 attachjmsxuserid           = '<%= attachjmsxuserid %>'
+defaultdeliverymode        = '<%= defaultdeliverymode %>'
+defaultredeliverydelay     = '<%= defaultredeliverydelay %>'
+
+def formatBoolean(value):
+  if value == '1':
+    return true
+  else:
+    return false
 
 edit()
 startEdit()
@@ -26,18 +35,22 @@ try:
     cd('/')
     cd('/JMSSystemResources/'+jmsmodule+'/JMSResource/'+jmsmodule+'/ConnectionFactories/'+name)
     cmo.setJNDIName(jndiname)
+    cmo.setLocalJNDIName(localjndiname)
 
-    if subdeployment:
-      cmo.setDefaultTargetingEnabled(false)
+    if subdeployment and defaulttargeting == "0":
       cmo.setSubDeploymentName(subdeployment)
-    else:
+    elif not subdeployment and defaulttargeting == "1":
       cmo.setDefaultTargetingEnabled(true)
+    elif subdeployment and defaulttargeting == "1":
+      raise ValueError('Defaulttargeting and Subdeployment are both set, only one can be active for JMS components')
+    else:
+      raise ValueError('Either defaulttargeting or a subdeployment needs to be selected for JMS components')
 
     cd('/JMSSystemResources/'+jmsmodule+'/JMSResource/'+jmsmodule+'/ConnectionFactories/'+name+'/TransactionParams/'+name)
     if xaenabled == '1':
       cmo.setXAConnectionFactoryEnabled(true)
     else:
-      cmo.setXAConnectionFactoryEnabled(false)   
+      cmo.setXAConnectionFactoryEnabled(false)
 
     if transactiontimeout:
       cmo.setTransactionTimeout( int(transactiontimeout) )
@@ -54,7 +67,7 @@ try:
 
     cd('/JMSSystemResources/'+jmsmodule+'/JMSResource/'+jmsmodule+'/ConnectionFactories/'+name+'/LoadBalancingParams/'+name)
     if loadbalancingenabled:
-      cmo.setServerAffinityEnabled( formatBoolean(loadbalancingenabled) )
+      cmo.setLoadBalancingEnabled( formatBoolean(loadbalancingenabled) )
     if serveraffinityenabled:
       cmo.setServerAffinityEnabled( formatBoolean(serveraffinityenabled) )
 
@@ -62,8 +75,14 @@ try:
     if attachjmsxuserid:
       cmo.setAttachJMSXUserId( formatBoolean(attachjmsxuserid) )
 
+    cd('/JMSSystemResources/'+jmsmodule+'/JMSResource/'+jmsmodule+'/ConnectionFactories/'+name+'/DefaultDeliveryParams/'+name)
+    if defaultdeliverymode:
+      cmo.setDefaultDeliveryMode(defaultdeliverymode)
+    if defaultredeliverydelay:
+      cmo.setDefaultRedeliveryDelay( int(defaultredeliverydelay) )
+
     save()
-    activate()          
+    activate()
     print "~~~~COMMAND SUCCESFULL~~~~"
 
 except:
@@ -72,6 +91,3 @@ except:
     stopEdit('y')
     print "~~~~COMMAND FAILED~~~~"
     raise
-
-
-

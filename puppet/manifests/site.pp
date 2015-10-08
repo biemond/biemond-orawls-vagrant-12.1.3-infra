@@ -14,6 +14,7 @@ node 'jrf2admin2.example.com' {
   include basic_config
   include fmw_config
   include datasources
+  include server_tlog
   include virtual_hosts
   include workmanagers
   include file_persistence
@@ -192,15 +193,15 @@ class nodemanager {
   $domain_name  = hiera('domain_name')
 
   orautils::nodemanagerautostart{"autostart weblogic":
-    version                 => "${str_version}",
-    domain                  => $domain_name,
-    domainPath              => "${domains_path}/${domain_name}",
-    wlHome                  => hiera('wls_weblogic_home_dir'),
-    user                    => hiera('wls_os_user'),
-    jsseEnabled             => hiera('wls_jsse_enabled'             ,false),
-    customTrust             => hiera('wls_custom_trust'             ,false),
-    trustKeystoreFile       => hiera('wls_trust_keystore_file'      ,undef),
-    trustKeystorePassphrase => hiera('wls_trust_keystore_passphrase',undef),
+    version                   => "${str_version}",
+    domain                    => $domain_name,
+    domain_path               => "${domains_path}/${domain_name}",
+    wl_home                   => hiera('wls_weblogic_home_dir'),
+    user                      => hiera('wls_os_user'),
+    jsse_enabled              => hiera('wls_jsse_enabled'             ,false),
+    custom_trust              => hiera('wls_custom_trust'             ,false),
+    trust_keystore_file       => hiera('wls_trust_keystore_file'      ,undef),
+    trust_keystore_passphrase => hiera('wls_trust_keystore_passphrase',undef),
   }
 
 }
@@ -293,8 +294,15 @@ class datasources{
   create_resources('wls_datasource',$datasource_instances, $default_params)
 }
 
-class virtual_hosts{
+class server_tlog{
   require datasources
+  $default_params = {}
+  $server_tlog_instances = hiera('server_tlog_instances', {})
+  create_resources('wls_server_tlog',$server_tlog_instances, $default_params)
+}
+
+class virtual_hosts{
+  require server_tlog
   $default_params = {}
   $virtual_host_instances = hiera('virtual_host_instances', {})
   create_resources('wls_virtual_host',$virtual_host_instances, $default_params)

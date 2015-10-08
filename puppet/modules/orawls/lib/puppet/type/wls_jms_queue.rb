@@ -1,11 +1,8 @@
-require 'easy_type'
-require 'utils/wls_access'
-require 'utils/settings'
-require 'utils/title_parser'
-require 'facter'
+require File.dirname(__FILE__) + '/../../orawls_core'
+
 
 module Puppet
-  newtype(:wls_jms_queue) do
+  Type.newtype(:wls_jms_queue) do
     include EasyType
     include Utils::WlsAccess
     extend Utils::TitleParser
@@ -54,12 +51,16 @@ module Puppet
     property :expirationpolicy
     property :redeliverydelay
     property :timetodeliver
+    property :deliverymode
     property :timetolive
     property :forwarddelay
+    property :templatename
+    property :messagelogging
 
     add_title_attributes(:jmsmodule, :queue_name) do
       /^((.*\/)?(.*):(.*)?)$/
     end
 
+    autorequire(:wls_jms_template) { "#{jmsmodule}:#{templatename}" }
   end
 end

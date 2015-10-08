@@ -224,6 +224,7 @@ def get_domain(domain_path, n)
   bpmTargets  = nil
   soaTargets  = nil
   osbTargets  = nil
+  bamTargets  = nil
 
   deployments = ''
   root.elements.each("app-deployment[module-type = 'ear']") do |apps|
@@ -233,6 +234,7 @@ def get_domain(domain_path, n)
     bpmTargets = apps.elements['target'].text if earName == 'BPMComposer'
     soaTargets = apps.elements['target'].text if earName == 'soa-infra'
     osbTargets = apps.elements['target'].text if earName == 'ALSB Routing' || earName == 'Service Bus Routing'
+    bamTargets = apps.elements['target'].text if earName == 'oracle-bam#11.1.1' || earName == 'BamServer'
   end
 
   Facter.add("#{prefix}_domain_#{n}_deployments") do
@@ -286,6 +288,20 @@ def get_domain(domain_path, n)
     end
   end
 
+  unless bamTargets.nil?
+    Facter.add("#{prefix}_domain_#{n}_bam") do
+      setcode do
+        bamTargets
+      end
+    end
+  else
+    Facter.add("#{prefix}_domain_#{n}_bam") do
+      setcode do
+        'NotFound'
+      end
+    end
+  end
+
   fileAdapterPlan = ''
   fileAdapterPlanEntries = ''
   root.elements.each("app-deployment[name = 'FileAdapter']") do |apps|
@@ -301,7 +317,7 @@ def get_domain(domain_path, n)
         planroot = subdoc.root
         planroot.elements['variable-definition'].elements.each('variable') do |eis|
           entry = eis.elements['value'].text
-          fileAdapterPlanEntries +=  eis.elements['value'].text + ';' if entry.include? 'eis'
+          fileAdapterPlanEntries +=  eis.elements['value'].text + ';'
         end
       end
     end
@@ -474,7 +490,6 @@ def get_domain(domain_path, n)
   end
 
   jrfTargets  = nil
-  bamTargets  = nil
   libraries   = ''
   root.elements.each('library') do |libs|
     libName = libs.elements['name'].text
@@ -482,10 +497,6 @@ def get_domain(domain_path, n)
     if libName.include? 'adf.oracle.domain#1.0'
       jrfTargets = libs.elements['target'].text
     end
-    if libName.include? 'oracle.bam.library'
-      bamTargets = libs.elements['target'].text
-    end
-
   end
 
   unless jrfTargets.nil?
@@ -502,21 +513,6 @@ def get_domain(domain_path, n)
       end
     end
     Puppet.debug "orawls.rb #{prefix}_domain_#{n}_jrf NotFound"
-  end
-
-  unless bamTargets.nil?
-    Facter.add("#{prefix}_domain_#{n}_bam") do
-      setcode do
-        bamTargets
-      end
-    end
-    Puppet.debug "orawls.rb #{prefix}_domain_#{n}_bam #{bamTargets}"
-  else
-    Facter.add("#{prefix}_domain_#{n}_bam") do
-      setcode do
-        'NotFound'
-      end
-    end
   end
 
   Facter.add("#{prefix}_domain_#{n}_libraries") do

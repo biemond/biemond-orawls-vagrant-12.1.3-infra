@@ -1,12 +1,9 @@
-require 'easy_type'
-require 'utils/wls_access'
-require 'utils/settings'
-require 'utils/title_parser'
-require 'facter'
+require File.dirname(__FILE__) + '/../../orawls_core'
+
 
 module Puppet
   #
-  newtype(:wls_foreign_server_object) do
+  Type.newtype(:wls_foreign_server_object) do
     include EasyType
     include Utils::WlsAccess
     extend Utils::TitleParser

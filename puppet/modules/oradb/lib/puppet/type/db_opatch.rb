@@ -30,7 +30,6 @@ module Puppet
 
         event
       end
-
     end
 
     newparam(:name) do
@@ -76,9 +75,9 @@ module Puppet
       EOT
     end
 
-    newparam(:clusterware) do
+    newparam(:opatch_auto) do
       desc <<-EOT
-        clusterware bundle patch
+        opatch auto bundle patch
       EOT
     end
 
@@ -87,6 +86,5 @@ module Puppet
         One of the Sub patch number of the bundle patch
       EOT
     end
-
   end
 end

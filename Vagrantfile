@@ -8,8 +8,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.define "jrf2admin2" , primary: true do |jrf2admin2|
 
-    jrf2admin2.vm.box = "centos-6.5-x86_64"
-    jrf2admin2.vm.box_url = "https://dl.dropboxusercontent.com/s/np39xdpw05wfmv4/centos-6.5-x86_64.box"
+    jrf2admin2.vm.box = "centos-6.6-x86_64"
+    jrf2admin2.vm.box_url = "https://dl.dropboxusercontent.com/s/ijt3ppej789liyp/centos-6.6-x86_64.box"
+
+    jrf2admin2.vm.provider :vmware_fusion do |v, override|
+      override.vm.box = "centos-6.6-x86_64-vmware"
+      override.vm.box_url = "https://dl.dropboxusercontent.com/s/7ytmqgghoo1ymlp/centos-6.6-x86_64-vmware.box"
+    end
 
     jrf2admin2.vm.hostname = "jrf2admin2.example.com"
     jrf2admin2.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=777","fmode=777"]
@@ -22,6 +27,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vb.customize ["modifyvm", :id, "--name"  , "jrf2admin2"]
       vb.customize ["modifyvm", :id, "--cpus"  , 2]
     end
+
+    jrf2admin2.vm.provider :vmware_fusion do |vb|
+      vb.vmx["numvcpus"] = "2"
+      vb.vmx["memsize"] = "2548"
+    end
+
+
 
     jrf2admin2.vm.provision :shell, :inline => "ln -sf /vagrant/puppet/hiera.yaml /etc/puppet/hiera.yaml;rm -rf /etc/puppet/modules;ln -sf /vagrant/puppet/modules /etc/puppet/modules"
 
@@ -41,11 +53,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "wlsdb" , primary: true do |wlsdb|
-    wlsdb.vm.box = "centos-6.5-x86_64"
-    wlsdb.vm.box_url = "https://dl.dropboxusercontent.com/s/np39xdpw05wfmv4/centos-6.5-x86_64.box"
 
-    #wlsdb.vm.box = "centos-7.0-x86_64"
-    #wlsdb.vm.box_url = "https://dl.dropboxusercontent.com/s/2w877odvrzj6v9x/centos-7.0-x86_64.box"
+
+    wlsdb.vm.box = "centos-6.6-x86_64"
+    wlsdb.vm.box_url = "https://dl.dropboxusercontent.com/s/ijt3ppej789liyp/centos-6.6-x86_64.box"
+
+    wlsdb.vm.provider :vmware_fusion do |v, override|
+      override.vm.box = "centos-6.6-x86_64-vmware"
+      override.vm.box_url = "https://dl.dropboxusercontent.com/s/7ytmqgghoo1ymlp/centos-6.6-x86_64-vmware.box"
+    end
 
     wlsdb.vm.hostname = "wlsdb.example.com"
     wlsdb.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=777","fmode=777"]
@@ -59,6 +75,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vb.customize ["modifyvm"     , :id, "--cpus"  , 2]
     end
 
+    wlsdb.vm.provider :vmware_fusion do |vb|
+      vb.vmx["numvcpus"] = "2"
+      vb.vmx["memsize"] = "2548"
+    end
+
+
 
     wlsdb.vm.provision :shell, :inline => "ln -sf /vagrant/puppet/hiera.yaml /etc/puppet/hiera.yaml;rm -rf /etc/puppet/modules;ln -sf /vagrant/puppet/modules /etc/puppet/modules"
 
@@ -69,9 +91,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       puppet.options           = [
                                   '--verbose',
                                   '--report',
+                                  '--trace',
 #                                  '--debug',
-                                  '--parser future',
-                                  '--strict_variables',
+#                                  '--parser future',
+#                                  '--strict_variables',
                                   '--hiera_config /vagrant/puppet/hiera.yaml'
                                  ]
 
